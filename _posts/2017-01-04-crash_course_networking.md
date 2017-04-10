@@ -16,6 +16,7 @@ Thankfully the powers that be at the International Organization for Standardizat
 
 ![OSI-Model]({{ site.url }}/images/OSI-Model.png)  
 
+<div id="HTTP"></div>
 ## The Application Layer ##  
 
 When people talk about going on the "internet", what they usually mean is: going on their web browser and using HTTP, that's hypertext transfer protocol, to look at cute pictures of cats or something. HTTP is an application layer protocol that dictates how a web server and a web browser communicate with one another. Here's an example of what your browser sends to my web server when you visit my page.  
