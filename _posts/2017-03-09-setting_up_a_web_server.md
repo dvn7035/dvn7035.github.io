@@ -10,7 +10,7 @@ categories: [operations]
 
 Web servers are nothing special. They're just machines that respond to specially crafted
 messages that follow the HTTP standard. The last <a href="{{ site.baseurl }}{% post_url
-2017-01-04-crash_course_networking %}#HTTP">page </a> had an example of what these kind of messages
+2017-01-04-crash_course_networking %}#HTTP">page</a> had an example of what these kind of messages
 can look like, but I encourage you to read up some more about HTTP. Setting one up wasn't difficult,
 so here's how I did it.  
 <!--more-->
@@ -25,19 +25,17 @@ protocol that runs on port 22 which allows you to control a computer remotely. U
 generally safer than using a password and DigitalOcean saves me the trouble of setting up (and doing 
 a write up for) an SSH server...for now.  
 
-![digital_ocean_1]({{ site.url }}/images/digital_ocean_1.png)  
+![digital_ocean_1](/images/digital_ocean_1.png)  
 ###### *Ubuntu? What a noob.* ######  
-![digital_ocean_2]({{ site.url }}/images/digital_ocean_2.png)
-  
-![digital_ocean_3]({{ site.url }}/images/digital_ocean_3.png)
-  
+![digital_ocean_2](/images/digital_ocean_2.png)  
+![digital_ocean_3](/images/digital_ocean_3.png)  
 
 At this point, I signed up for a domain with Google Domains. Any registar would have sufficed; in
 fact in the Github Student Developer Pack, they offer a free .me domain through Namecheap. Here I
 made two DNS records: an A record that maps my domain to the ip address of my DigitalOcean box and a
 CNAME record that maps www to dvn7035.com.  
 
-![google_domains_dns]({{ site.url }}/images/google_domains_dns.png)  
+![google_domains_dns](/images/google_domains_dns.png)  
 
 If you're not clear on DNS, it's just a way for clients like you to visit my web site without having
 to put an IP address in your URL bar. The first record with the '@' symbol is an exact match. Anyone

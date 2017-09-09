@@ -8,7 +8,7 @@ tags: [infrastructure@localhost, server, raspberry, pi]
 categories: [operations]
 ---
 
-![digital_ocean_1]({{ site.url }}/images/raspberry_pi.png)
+![raspberry_pi](/images/raspberry_pi.jpg)
 <!--more-->
 ###### 3 Raspberry Pi 3's stacked on each other and a Raspberry Pi Model B for scale ######
 

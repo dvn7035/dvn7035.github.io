@@ -14,7 +14,7 @@ So computer networking is pretty simple right? It's nothing more than bits of 1'
 
 Thankfully the powers that be at the International Organization for Standardization came up with the Open Systems Interconnection model, or OSI model, to break down networking in different layers. We're gonna focus on 3 layers: Application, Transport, and Network. Specifically, we'll look at the interactions between a computer and a web server. I'll be using a textbook called Computer Networking: A Top Down Approach, 6th edition by Kurose and Ross as reference. I'm not using it because it's a particularly good book or anything; it just happens to be the only networking book I have because CS 118 at UCLA uses it. Let's get to it.  
 
-![OSI-Model]({{ site.url }}/images/OSI-Model.png)  
+![OSI-Model](/images/OSI-Model.png)  
 
 <div id="HTTP"></div>
 ## The Application Layer ##  
@@ -46,7 +46,7 @@ First of all, I have to talk about TCP. It stands for transmission control proto
 
 Here is what a TCP segment looks like.  
 
-![TCP-Segment]({{ site.url }}/images/TCP-Segment.png)  
+![TCP-Segment](/images/TCP-Segment.png)  
 
 So what are port numbers? Port numbers are unsigned 16 bit numbers that allows your OS to identify which segment is meant for which process in your computer. Suppose you had a web browser open and it was listening in at port 12345 and it was going to send out that TCP enveloped HTTP request. Your OS would set the Source Port as 12345 and Destination Port as 80, the standard port that web server programs listen in on, and send it to my web server. When my web server replies with its TCP enveloped HTTP response, the ports are switched. Its Source port is 80 and its Destination port is 12345. Your OS will know that the segment was meant for your web browser because the segment's Destination Port is 12345.  
 
@@ -56,7 +56,7 @@ Now let's talk about IP or internet protocol. Wait you might ask: why do we need
 
 Every computer and even our home router has an IP address and sends data to each other in the form of IP packets. They look something like this.  
 
-![IP-Packet]({{ site.url }}/images/IP-Packet.png)  
+![IP-Packet](/images/IP-Packet.png)  
 
 Let's ignore every field except Source Address, Destination Address, and Data. Let's say our address is 192.168.1.2 and my web server's address is 162.243.149.160. Your OS again does the heavy lifting and embeds the TCP segment with the HTTP request in the IP packet's Data field with Source Address 192.168.1.2 and Destination Address 162.243.149.160 and sends it to your router. My web server's response comes to your computer as a packet with the Source and Destination Address reversed (just like the TCP ports).  
 
@@ -64,6 +64,6 @@ Let's ignore every field except Source Address, Destination Address, and Data. L
 
 The interconnected network of networks of computers connected via this TCP/IP suite is called the internet. However, TCP/IP is not how modern applications use the internet. They use higher abstractions at the application layer. Looking at our example of visiting this website, your computer and my web server talk to each other with an HTTP request encapsulated in a TCP segment that is further encapsulated in an IP packet. Here's another infographic for your benefit.  
 
-![OSI-Overview]({{ site.url }}/images/OSI-Overview.png)  
+![OSI-Overview](/images/OSI-Overview.png)  
 
 Argh, enough with this theory stuff. Let's fire up some servers already! I feel ya. Our next topic will be how to set up your first web server.
