@@ -9,8 +9,7 @@ categories: [operations]
 ---
 
 Web servers are nothing special. They're just machines that respond to specially crafted
-messages that follow the HTTP standard. The last <a href="{{ site.baseurl }}{% post_url
-2017-01-04-crash_course_networking %}#HTTP">page</a> had an example of what these kind of messages
+messages that follow the HTTP standard. The last [page](/operations/2017/01/04/crash_course_networking/#HTTP) had an example of what these kind of messages
 can look like, but I encourage you to read up some more about HTTP. Setting one up wasn't difficult,
 so here's how I did it.  
 <!--more-->
