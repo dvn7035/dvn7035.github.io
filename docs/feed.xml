@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="https://www.dvn7035.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.dvn7035.com/" rel="alternate" type="text/html" /><updated>2017-09-10T17:14:32-07:00</updated><id>https://www.dvn7035.com/</id><title type="html">dvn7035</title><subtitle>Yet another technology blog
+</subtitle><author><name>David Nguyen</name></author><entry><title type="html">New Raspberry Pi 3s</title><link href="https://www.dvn7035.com/operations/2017/04/07/new_raspberry_pi3s/" rel="alternate" type="text/html" title="New Raspberry Pi 3s" /><published>2017-04-07T00:00:00-07:00</published><updated>2017-04-07T00:00:00-07:00</updated><id>https://www.dvn7035.com/operations/2017/04/07/new_raspberry_pi3s</id><content type="html" xml:base="https://www.dvn7035.com/operations/2017/04/07/new_raspberry_pi3s/">&lt;p&gt;&lt;img src=&quot;/images/raspberry_pi.jpg&quot; alt=&quot;raspberry_pi&quot; /&gt;
+&lt;!--more--&gt;&lt;/p&gt;
+&lt;h6 id=&quot;3-raspberry-pi-3s-stacked-on-each-other-and-a-raspberry-pi-model-b-for-scale&quot;&gt;3 Raspberry Pi 3’s stacked on each other and a Raspberry Pi Model B for scale&lt;/h6&gt;
+
+&lt;p&gt;Over the spring break, I was able to get my hands on 3 new Raspberry Pi 3’s. They’re going to be my
+new homelab that will run my web site and a few other projects I have in store.&lt;/p&gt;
+
+&lt;p&gt;The Raspberry Pis are pretty interesting pieces of hardware. They run power efficient ARM
+processors, are dirt cheap, and best of all can run a Linux distribution. Sure they might not be
+that powerful, but I enjoy the challenge of working within the bounds of some constraint. You don’t
+always get to play with the greatest and shiniest of toys.&lt;/p&gt;
+
+&lt;p&gt;In the picture above, is my Raspberry Pi Model B and the 3 new Pis stacked on each other. The Model
+B will be hooked up to a HDD via USB and will run LDAP, Salt, NFS, and other services that are
+stateful (I wonder if it is strong enough to run GitLab). Meanwhile the new Pis will be part of a
+Docker Swarm cluster. The projects that I can containerize, will run on that cluster and Swarm will
+manage balancing the load on each Pi and handle failover. Stay tuned for write ups about that.&lt;/p&gt;</content><author><name>David Nguyen</name></author><category term="infrastructure@localhost" /><category term="server" /><category term="raspberry" /><category term="pi" /><summary type="html"></summary></entry><entry><title type="html">Setting up a Web Server</title><link href="https://www.dvn7035.com/operations/2017/03/09/setting_up_a_web_server/" rel="alternate" type="text/html" title="Setting up a Web Server" /><published>2017-03-09T00:00:00-08:00</published><updated>2017-03-09T00:00:00-08:00</updated><id>https://www.dvn7035.com/operations/2017/03/09/setting_up_a_web_server</id><content type="html" xml:base="https://www.dvn7035.com/operations/2017/03/09/setting_up_a_web_server/">&lt;p&gt;Web servers are nothing special. They’re just machines that respond to specially crafted
+messages that follow the HTTP standard. The last &lt;a href=&quot;/operations/2017/01/04/crash_course_networking/#HTTP&quot;&gt;page&lt;/a&gt; had an example of what these kind of messages
+can look like, but I encourage you to read up some more about HTTP. Setting one up wasn’t difficult,
+so here’s how I did it.&lt;br /&gt;
+&lt;!--more--&gt;&lt;/p&gt;
+
+&lt;p&gt;So first off, I started by taking advantage of the &lt;a href=&quot;https://education.github.com/pack&quot;&gt;GitHub Student Developer
+Pack&lt;/a&gt;. At the time, I did not have the hardware to self host this
+site in my home, so I resorted to using a virtual private server instance from DigitalOcean. It was 
+a no brainer since they were offering $50 in credit.&lt;/p&gt;
+
+&lt;p&gt;After signing up, I started an Ubuntu 16.04 machine with my SSH keys preloaded. SSH is but another
+protocol that runs on port 22 which allows you to control a computer remotely. Using a key is 
+generally safer than using a password and DigitalOcean saves me the trouble of setting up (and doing 
+a write up for) an SSH server…for now.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/digital_ocean_1.png&quot; alt=&quot;digital_ocean_1&quot; /&gt;&lt;/p&gt;
+&lt;h6 id=&quot;ubuntu-what-a-noob&quot;&gt;&lt;em&gt;Ubuntu? What a noob.&lt;/em&gt;&lt;/h6&gt;
+&lt;p&gt;&lt;img src=&quot;/images/digital_ocean_2.png&quot; alt=&quot;digital_ocean_2&quot; /&gt;&lt;br /&gt;
+&lt;img src=&quot;/images/digital_ocean_3.png&quot; alt=&quot;digital_ocean_3&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;At this point, I signed up for a domain with Google Domains. Any registar would have sufficed; in
+fact in the Github Student Developer Pack, they offer a free .me domain through Namecheap. Here I
+made two DNS records: an A record that maps my domain to the ip address of my DigitalOcean box and a
+CNAME record that maps www to dvn7035.com.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/google_domains_dns.png&quot; alt=&quot;google_domains_dns&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;If you’re not clear on DNS, it’s just a way for clients like you to visit my web site without having
+to put an IP address in your URL bar. The first record with the ‘@’ symbol is an exact match. Anyone
+who types in exactly “dvn7035.com” will be given the ip address listed. The second record with “www”
+means that visitors who prepend “dvn7035.com” with “www.” (i.e. “www.dvn7035.com”, though seriously
+who does this?) will be pointed to dvn7035.com which surprise, surprise gets handled by the first
+record.&lt;/p&gt;
+
+&lt;p&gt;Next I SSH’d into my machine&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ssh -l root dvn7035.com
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h1 id=&quot;installing-nginx&quot;&gt;Installing Nginx&lt;/h1&gt;
+&lt;p&gt;Now it was the time to install and Nginx (pronounced: “engine x”) which is a web server program that
+hosts my site. My web pages are mostly static, that is, the page see you now is the same file
+somewhere on this server. Nginx will look into a certain folder and give you this page based on your 
+url.&lt;/p&gt;
+
+&lt;p&gt;Before I could install Nginx, I had to add the software’s repository to my list of repositories. In
+/etc/apt/sources.list I added these two lines&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;deb http://nginx.org/packages/ubuntu/ xenial nginx  
+deb-src http://nginx.org/packages/ubuntu/ xenial nginx  
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This allowed me to install the most recent nginx version for Ubuntu 16.04 from Nginx themselves
+instead of relying on the packages in the official Ubuntu repository&lt;/p&gt;
+
+&lt;p&gt;I then ran these commands to import Nginx’s PGP so that apt, short for Advanced Package Tool, won’t
+complain that the repository has unverified signatures.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;wget http://nginx.org/keys/nginx_signing.key  
+apt-key add nginx_signing.key  
+apt update  
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;To actually install Nginx it was as simple as typing&lt;br /&gt;
+apt install nginx&lt;/p&gt;
+
+&lt;h1 id=&quot;configuring-firewall&quot;&gt;Configuring Firewall&lt;/h1&gt;
+&lt;p&gt;After installation however, the web site was still not yet available. This was because iptables, the
+firewall for Linux was blocking incoming connections. I typed the following commands to allow web
+traffic through 80 (HTTP), 443 (HTTPS), and 22 (SSH). Also I set the default behavior to block
+incoming connections not specified by a specific rule.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;apt install ufw  
+ufw default deny incoming  
+ufw enable  
+ufw allow ssh  
+ufw allow http  
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;You might have noticed I installed and used a program called ufw. Ufw is a easier front-end for
+iptables because at the time I did not know how to write iptable rules directly. Anyway, I then
+confirmed the rules by running&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ufw status  
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h1 id=&quot;configuring-nginx&quot;&gt;Configuring Nginx&lt;/h1&gt;
+&lt;p&gt;At this point, when I visited my website through the browser, I was greeeted with the default Nginx
+homepage. That was nice and all, but there were some configurations that I wanted in place like url
+redirection and HTTPS. The first thing to check was the /etc/nginx directory. In general, /etc holds
+all configuration files for any application. The first file of interest in this directory was
+nginx.conf.&lt;/p&gt;
+
+&lt;p&gt;The most imporant line then was&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;include /etc/nginx/conf.d/\*.conf;  
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This meant that nginx will look for all files ending with “.conf” in /etc/nginx/conf.d for
+configuration variables as well. By looking at that directory&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ls /etc/nginx/conf.d  
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;I had found default.conf. Opening it with my favorite text editor in vim, I was able to change it to
+this&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;server {  
+    listen 80;  
+    server_name www.dvn7035.com dvn7035.com;  
+    return 301 https://www.dvn7035.com$request_uri;  
+}  
+  
+server {  
+    listen 443 ssl;  
+    server_name dvn7035.com;  
+    ssl_certificate /etc/letsencrypt/live/dvn7035.com/fullchain.pem;  
+    ssl_certificate_key /etc/letsencrypt/live/dvn7035.com/privkey.pem;  
+    return 301 https://www.dvn7035.com$request_uri;  
+}  
+  
+server {  
+    listen       443 ssl;  
+    server_name  www.dvn7035.com;  
+    ssl_certificate /etc/letsencrypt/live/dvn7035.com/fullchain.pem;  
+    ssl_certificate_key /etc/letsencrypt/live/dvn7035.com/privkey.pem;  
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;  
+    ssl_prefer_server_ciphers on;  
+    ssl_dhparam /etc/ssl/certs/dhparam.pem;  
+    ssl_ciphers 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA';  
+    ssl_session_timeout 1d;  
+    ssl_session_cache shared:SSL:50m;  
+    ssl_stapling on;  
+    ssl_stapling_verify on;  
+    add_header Strict-Transport-Security max-age=15768000;  
+  
+    location / {  
+        root   /usr/share/nginx/html;  
+        index  index.html index.htm;  
+    }  
+    error_page   500 502 503 504  /50x.html;  
+    location = /50x.html {  
+        root   /usr/share/nginx/html;  
+    }  
+}  
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This all might look a little daunting, but let me break it down some before your eyes gloss over it:&lt;br /&gt;
+The first block tells Nginx to listen in at port 80 and respond to any request with a redirect to
+the secure version the site at “https://www.dvn7035.com”. Notice that even if you didn’t prepend the
+url with www, the site with still redirect you to the canonical name that has the www prefix.&lt;/p&gt;
+
+&lt;p&gt;The second block deals with HTTPS requests. Nginx will listen in on port 443, and redirect any HTTPS
+request without the www. You might ask, what’s with the strict adherance to have www for my website,
+but unfortunately the reasons are kinda esotreic and border on epistemology. Just understand that it
+really just my preference.&lt;/p&gt;
+
+&lt;p&gt;Finally, the third block is where the real meat of the configuration lies. Notice that it specifies,
+ssl_certificate and ssl_certificate_key. These are files needed to serve the web site over HTTPS.
+They aren’t there yet, but I know these files will exist once I run an application called
+Certbot (I’ve rebuilt this site too many times to count). Also the field ssl_ciphers specify the
+encryption standards I’m allowing the server to accept. I have to confess that a lot of these
+settings are taken from the DigitalOcean tutorial and according to Symantec’s CryptoReport, these
+settings make the site vulnerable to BEAST attacks, oops. I’ll fix these issues when I containerize
+Nginx. Anyway, the “location /” sub-block specifies the web root of the web site. This means Nginx
+will look in this folder when you specify a specific page. For example, if you typed
+“https://www.dvn7035.com/blah”, Nginx will look into the folder /usr/share/nginx/html for a file
+called blah (or blah.html, I think). If you don’t specify a specific page and just type
+“https://www.dvn7035.com” the server will give you /usr/share/nginx/html/index.html or (htm).&lt;/p&gt;
+
+&lt;h1 id=&quot;getting-https&quot;&gt;Getting HTTPS&lt;/h1&gt;
+&lt;p&gt;I was nearly done, all I had to do next was install Certbot and run the program to grab an SSL
+certificate from Let’s Encrypt. Let’s Encrypt is a certificate authority that gives out free SSL
+certificates for web site owners if they can prove that they own a domain. This is done through
+the ACME protocol which Certbot handles for me.&lt;/p&gt;
+
+&lt;p&gt;I added Cerbot’s repository,&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;add-apt-repository ppa:certbot/certbot  
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;instaled it,&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo apt-get update  
+sudo apt-get install certbot  
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;and then ran it.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;certbot certonly --webroot -w /usr/share/nginx/html -d dvn7035.com -d www.dvn7035.com.com  
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The certificates are only valid for like 3 months. After that, they become invalid and your browser
+will probably warn you that this web site is unsecure. I currently rerun this command every so often
+even though I should just have a cron job automate it for me. Oh well, I’ll do it next time when I
+migrate the site again.&lt;/p&gt;
+
+&lt;p&gt;All that was left then was to restart Nginx.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;service nginx restart
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;</content><author><name>David Nguyen</name></author><category term="infrastructure@localhost" /><category term="HTTP" /><category term="web" /><category term="server" /><summary type="html">Web servers are nothing special. They’re just machines that respond to specially crafted messages that follow the HTTP standard. The last page had an example of what these kind of messages can look like, but I encourage you to read up some more about HTTP. Setting one up wasn’t difficult, so here’s how I did it.</summary></entry><entry><title type="html">Crash Course Networking</title><link href="https://www.dvn7035.com/operations/2017/01/04/crash_course_networking/" rel="alternate" type="text/html" title="Crash Course Networking" /><published>2017-01-04T00:00:00-08:00</published><updated>2017-01-04T00:00:00-08:00</updated><id>https://www.dvn7035.com/operations/2017/01/04/crash_course_networking</id><content type="html" xml:base="https://www.dvn7035.com/operations/2017/01/04/crash_course_networking/">&lt;p&gt;So computer networking is pretty simple right? It’s nothing more than bits of 1’s and 0’s moving from one computer to another. Except it’s actually about electromagnetic waves propagating from one point to another through some medium. Except electromagnetic waves are made up of photons, so what we really have to talk about is quantum mechanics. And this continues forever if we don’t set up some abstractions. Get used to that word: abstraction. It’s a powerful tool so that we won’t have to know the intricacies of an internal combustion engine in order to learn how to drive a car-metaphorically speaking of course. We’re learning about networking, not cars!&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;Thankfully the powers that be at the International Organization for Standardization came up with the Open Systems Interconnection model, or OSI model, to break down networking in different layers. We’re gonna focus on 3 layers: Application, Transport, and Network. Specifically, we’ll look at the interactions between a computer and a web server. I’ll be using a textbook called Computer Networking: A Top Down Approach, 6th edition by Kurose and Ross as reference. I’m not using it because it’s a particularly good book or anything; it just happens to be the only networking book I have because CS 118 at UCLA uses it. Let’s get to it.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/OSI-Model.png&quot; alt=&quot;OSI-Model&quot; /&gt;&lt;/p&gt;
+
+&lt;div id=&quot;HTTP&quot;&gt;&lt;/div&gt;
+&lt;h2 id=&quot;the-application-layer&quot;&gt;The Application Layer&lt;/h2&gt;
+
+&lt;p&gt;When people talk about going on the “internet”, what they usually mean is: going on their web browser and using HTTP, that’s hypertext transfer protocol, to look at cute pictures of cats or something. HTTP is an application layer protocol that dictates how a web server and a web browser communicate with one another. Here’s an example of what your browser sends to my web server when you visit my page.&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;GET / HTTP/1.1&lt;br /&gt;
+Host: www.dvn7035.com&lt;br /&gt;
+User-Agent: curl/7.47.0&lt;br /&gt;
+Accept: */*&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The web server will respond with a similar header followed by the actual contents of the page.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;HTTP/1.1 200 OK&lt;br /&gt;
+Server: nginx/1.10.2&lt;br /&gt;
+Date: Wed, 04 Jan 2017 09:05:43 GMT&lt;br /&gt;
+Content-Type: text/html&lt;br /&gt;
+Content-Length: 7614&lt;br /&gt;
+Last-Modified: Wed, 04 Jan 2017 04:10:08 GMT&lt;br /&gt;
+Connection: keep-alive&lt;br /&gt;
+&lt;em&gt;(continues on with more header information and eventually the text of the actual page)&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;But HTTP is just one protocol at this layer. It’s why the web (HTTP) is NOT the internet; it’s just a small part of it. On the internet there’s also DNS so you can get the IP address of a web server, IMAP for email, FTP for file transfer, etc. But we can’t stop here, we gotta go deeper.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-transport-layer&quot;&gt;The Transport Layer&lt;/h2&gt;
+
+&lt;p&gt;Let’s go back to our example where your browser requested a page from my web server. How did my web server know that you sent them a request? Where is the web server looking for this request? Where is your web browser looking for these responses?&lt;/p&gt;
+
+&lt;p&gt;First of all, I have to talk about TCP. It stands for transmission control protocol and is widely used at the transport layer. When your web browser wants to send that HTTP request from earlier to my web server, your OS crafts a TCP segment and embeds the HTTP request in the segment’s Data field. My web server embeds its response in a TCP segment as well. It’s clear the the HTTP piggybacks off of TCP and it will be a recurring design as we go further.&lt;/p&gt;
+
+&lt;p&gt;Here is what a TCP segment looks like.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/TCP-Segment.png&quot; alt=&quot;TCP-Segment&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;So what are port numbers? Port numbers are unsigned 16 bit numbers that allows your OS to identify which segment is meant for which process in your computer. Suppose you had a web browser open and it was listening in at port 12345 and it was going to send out that TCP enveloped HTTP request. Your OS would set the Source Port as 12345 and Destination Port as 80, the standard port that web server programs listen in on, and send it to my web server. When my web server replies with its TCP enveloped HTTP response, the ports are switched. Its Source port is 80 and its Destination port is 12345. Your OS will know that the segment was meant for your web browser because the segment’s Destination Port is 12345.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-network-layer&quot;&gt;The Network Layer&lt;/h2&gt;
+
+&lt;p&gt;Now let’s talk about IP or internet protocol. Wait you might ask: why do we need yet another protocol? Well with that TCP packet and embedded HTTP request to dvn7035.com, we still don’t know where to send it to. We don’t have an address, but thankfully the internet protocol solves this problem.&lt;/p&gt;
+
+&lt;p&gt;Every computer and even our home router has an IP address and sends data to each other in the form of IP packets. They look something like this.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/IP-Packet.png&quot; alt=&quot;IP-Packet&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Let’s ignore every field except Source Address, Destination Address, and Data. Let’s say our address is 192.168.1.2 and my web server’s address is 162.243.149.160. Your OS again does the heavy lifting and embeds the TCP segment with the HTTP request in the IP packet’s Data field with Source Address 192.168.1.2 and Destination Address 162.243.149.160 and sends it to your router. My web server’s response comes to your computer as a packet with the Source and Destination Address reversed (just like the TCP ports).&lt;/p&gt;
+
+&lt;h2 id=&quot;in-summary&quot;&gt;In Summary&lt;/h2&gt;
+
+&lt;p&gt;The interconnected network of networks of computers connected via this TCP/IP suite is called the internet. However, TCP/IP is not how modern applications use the internet. They use higher abstractions at the application layer. Looking at our example of visiting this website, your computer and my web server talk to each other with an HTTP request encapsulated in a TCP segment that is further encapsulated in an IP packet. Here’s another infographic for your benefit.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/OSI-Overview.png&quot; alt=&quot;OSI-Overview&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Argh, enough with this theory stuff. Let’s fire up some servers already! I feel ya. Our next topic will be how to set up your first web server.&lt;/p&gt;</content><author><name>David Nguyen</name></author><category term="infrastructure@localhost" /><category term="operations" /><category term="networking" /><category term="TCP" /><category term="IP" /><category term="HTTP" /><summary type="html">So computer networking is pretty simple right? It’s nothing more than bits of 1’s and 0’s moving from one computer to another. Except it’s actually about electromagnetic waves propagating from one point to another through some medium. Except electromagnetic waves are made up of photons, so what we really have to talk about is quantum mechanics. And this continues forever if we don’t set up some abstractions. Get used to that word: abstraction. It’s a powerful tool so that we won’t have to know the intricacies of an internal combustion engine in order to learn how to drive a car-metaphorically speaking of course. We’re learning about networking, not cars!</summary></entry><entry><title type="html">Hello world!</title><link href="https://www.dvn7035.com/intro/2017/01/03/first-post/" rel="alternate" type="text/html" title="Hello world!" /><published>2017-01-03T00:00:00-08:00</published><updated>2017-01-03T00:00:00-08:00</updated><id>https://www.dvn7035.com/intro/2017/01/03/first-post</id><content type="html" xml:base="https://www.dvn7035.com/intro/2017/01/03/first-post/">&lt;p&gt;Hello, welcome to my blog and the first post in it. Here I will share my expriences mainly with
+programming and system administration, though not limited to. Mosts posts will just be opinionated
+quips on this and that and some will be more tutorial-like. Hopefully, it will be a learning
+exprience for both of us. Stay tuned for more posts.&lt;/p&gt;</content><author><name>David Nguyen</name></author><category term="first" /><summary type="html">Hello, welcome to my blog and the first post in it. Here I will share my expriences mainly with programming and system administration, though not limited to. Mosts posts will just be opinionated quips on this and that and some will be more tutorial-like. Hopefully, it will be a learning exprience for both of us. Stay tuned for more posts.</summary></entry></feed>

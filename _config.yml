@@ -23,6 +23,7 @@ url: "https://www.dvn7035.com" # the base hostname & protocol for your site, e.g
 permalink: pretty
 
 # Build settings
+destination: ./docs
 markdown: kramdown
 theme: minima
 gems:

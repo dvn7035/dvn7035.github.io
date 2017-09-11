@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Setting up a Web Server</title>
+  <meta name="description" content="Web servers are nothing special. They’re just machines that respond to specially crafted messages that follow the HTTP standard. The last page had an example...">
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://www.dvn7035.com/operations/2017/03/09/setting_up_a_web_server/">
+  <link rel="alternate" type="application/rss+xml" title="dvn7035" href="/feed.xml">
+  
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">dvn7035</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Setting up a Web Server</h1>
+    <p class="post-meta"><time datetime="2017-03-09T00:00:00-08:00" itemprop="datePublished">Mar 9, 2017</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>Web servers are nothing special. They’re just machines that respond to specially crafted
+messages that follow the HTTP standard. The last <a href="/operations/2017/01/04/crash_course_networking/#HTTP">page</a> had an example of what these kind of messages
+can look like, but I encourage you to read up some more about HTTP. Setting one up wasn’t difficult,
+so here’s how I did it.<br />
+<!--more--></p>
+
+<p>So first off, I started by taking advantage of the <a href="https://education.github.com/pack">GitHub Student Developer
+Pack</a>. At the time, I did not have the hardware to self host this
+site in my home, so I resorted to using a virtual private server instance from DigitalOcean. It was 
+a no brainer since they were offering $50 in credit.</p>
+
+<p>After signing up, I started an Ubuntu 16.04 machine with my SSH keys preloaded. SSH is but another
+protocol that runs on port 22 which allows you to control a computer remotely. Using a key is 
+generally safer than using a password and DigitalOcean saves me the trouble of setting up (and doing 
+a write up for) an SSH server…for now.</p>
+
+<p><img src="/images/digital_ocean_1.png" alt="digital_ocean_1" /></p>
+<h6 id="ubuntu-what-a-noob"><em>Ubuntu? What a noob.</em></h6>
+<p><img src="/images/digital_ocean_2.png" alt="digital_ocean_2" /><br />
+<img src="/images/digital_ocean_3.png" alt="digital_ocean_3" /></p>
+
+<p>At this point, I signed up for a domain with Google Domains. Any registar would have sufficed; in
+fact in the Github Student Developer Pack, they offer a free .me domain through Namecheap. Here I
+made two DNS records: an A record that maps my domain to the ip address of my DigitalOcean box and a
+CNAME record that maps www to dvn7035.com.</p>
+
+<p><img src="/images/google_domains_dns.png" alt="google_domains_dns" /></p>
+
+<p>If you’re not clear on DNS, it’s just a way for clients like you to visit my web site without having
+to put an IP address in your URL bar. The first record with the ‘@’ symbol is an exact match. Anyone
+who types in exactly “dvn7035.com” will be given the ip address listed. The second record with “www”
+means that visitors who prepend “dvn7035.com” with “www.” (i.e. “www.dvn7035.com”, though seriously
+who does this?) will be pointed to dvn7035.com which surprise, surprise gets handled by the first
+record.</p>
+
+<p>Next I SSH’d into my machine</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>ssh -l root dvn7035.com
+</code></pre>
+</div>
+
+<h1 id="installing-nginx">Installing Nginx</h1>
+<p>Now it was the time to install and Nginx (pronounced: “engine x”) which is a web server program that
+hosts my site. My web pages are mostly static, that is, the page see you now is the same file
+somewhere on this server. Nginx will look into a certain folder and give you this page based on your 
+url.</p>
+
+<p>Before I could install Nginx, I had to add the software’s repository to my list of repositories. In
+/etc/apt/sources.list I added these two lines</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>deb http://nginx.org/packages/ubuntu/ xenial nginx  
+deb-src http://nginx.org/packages/ubuntu/ xenial nginx  
+</code></pre>
+</div>
+
+<p>This allowed me to install the most recent nginx version for Ubuntu 16.04 from Nginx themselves
+instead of relying on the packages in the official Ubuntu repository</p>
+
+<p>I then ran these commands to import Nginx’s PGP so that apt, short for Advanced Package Tool, won’t
+complain that the repository has unverified signatures.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>wget http://nginx.org/keys/nginx_signing.key  
+apt-key add nginx_signing.key  
+apt update  
+</code></pre>
+</div>
+
+<p>To actually install Nginx it was as simple as typing<br />
+apt install nginx</p>
+
+<h1 id="configuring-firewall">Configuring Firewall</h1>
+<p>After installation however, the web site was still not yet available. This was because iptables, the
+firewall for Linux was blocking incoming connections. I typed the following commands to allow web
+traffic through 80 (HTTP), 443 (HTTPS), and 22 (SSH). Also I set the default behavior to block
+incoming connections not specified by a specific rule.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>apt install ufw  
+ufw default deny incoming  
+ufw enable  
+ufw allow ssh  
+ufw allow http  
+</code></pre>
+</div>
+
+<p>You might have noticed I installed and used a program called ufw. Ufw is a easier front-end for
+iptables because at the time I did not know how to write iptable rules directly. Anyway, I then
+confirmed the rules by running</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>ufw status  
+</code></pre>
+</div>
+
+<h1 id="configuring-nginx">Configuring Nginx</h1>
+<p>At this point, when I visited my website through the browser, I was greeeted with the default Nginx
+homepage. That was nice and all, but there were some configurations that I wanted in place like url
+redirection and HTTPS. The first thing to check was the /etc/nginx directory. In general, /etc holds
+all configuration files for any application. The first file of interest in this directory was
+nginx.conf.</p>
+
+<p>The most imporant line then was</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>include /etc/nginx/conf.d/\*.conf;  
+</code></pre>
+</div>
+
+<p>This meant that nginx will look for all files ending with “.conf” in /etc/nginx/conf.d for
+configuration variables as well. By looking at that directory</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>ls /etc/nginx/conf.d  
+</code></pre>
+</div>
+
+<p>I had found default.conf. Opening it with my favorite text editor in vim, I was able to change it to
+this</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>server {  
+    listen 80;  
+    server_name www.dvn7035.com dvn7035.com;  
+    return 301 https://www.dvn7035.com$request_uri;  
+}  
+  
+server {  
+    listen 443 ssl;  
+    server_name dvn7035.com;  
+    ssl_certificate /etc/letsencrypt/live/dvn7035.com/fullchain.pem;  
+    ssl_certificate_key /etc/letsencrypt/live/dvn7035.com/privkey.pem;  
+    return 301 https://www.dvn7035.com$request_uri;  
+}  
+  
+server {  
+    listen       443 ssl;  
+    server_name  www.dvn7035.com;  
+    ssl_certificate /etc/letsencrypt/live/dvn7035.com/fullchain.pem;  
+    ssl_certificate_key /etc/letsencrypt/live/dvn7035.com/privkey.pem;  
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;  
+    ssl_prefer_server_ciphers on;  
+    ssl_dhparam /etc/ssl/certs/dhparam.pem;  
+    ssl_ciphers 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA';  
+    ssl_session_timeout 1d;  
+    ssl_session_cache shared:SSL:50m;  
+    ssl_stapling on;  
+    ssl_stapling_verify on;  
+    add_header Strict-Transport-Security max-age=15768000;  
+  
+    location / {  
+        root   /usr/share/nginx/html;  
+        index  index.html index.htm;  
+    }  
+    error_page   500 502 503 504  /50x.html;  
+    location = /50x.html {  
+        root   /usr/share/nginx/html;  
+    }  
+}  
+</code></pre>
+</div>
+
+<p>This all might look a little daunting, but let me break it down some before your eyes gloss over it:<br />
+The first block tells Nginx to listen in at port 80 and respond to any request with a redirect to
+the secure version the site at “https://www.dvn7035.com”. Notice that even if you didn’t prepend the
+url with www, the site with still redirect you to the canonical name that has the www prefix.</p>
+
+<p>The second block deals with HTTPS requests. Nginx will listen in on port 443, and redirect any HTTPS
+request without the www. You might ask, what’s with the strict adherance to have www for my website,
+but unfortunately the reasons are kinda esotreic and border on epistemology. Just understand that it
+really just my preference.</p>
+
+<p>Finally, the third block is where the real meat of the configuration lies. Notice that it specifies,
+ssl_certificate and ssl_certificate_key. These are files needed to serve the web site over HTTPS.
+They aren’t there yet, but I know these files will exist once I run an application called
+Certbot (I’ve rebuilt this site too many times to count). Also the field ssl_ciphers specify the
+encryption standards I’m allowing the server to accept. I have to confess that a lot of these
+settings are taken from the DigitalOcean tutorial and according to Symantec’s CryptoReport, these
+settings make the site vulnerable to BEAST attacks, oops. I’ll fix these issues when I containerize
+Nginx. Anyway, the “location /” sub-block specifies the web root of the web site. This means Nginx
+will look in this folder when you specify a specific page. For example, if you typed
+“https://www.dvn7035.com/blah”, Nginx will look into the folder /usr/share/nginx/html for a file
+called blah (or blah.html, I think). If you don’t specify a specific page and just type
+“https://www.dvn7035.com” the server will give you /usr/share/nginx/html/index.html or (htm).</p>
+
+<h1 id="getting-https">Getting HTTPS</h1>
+<p>I was nearly done, all I had to do next was install Certbot and run the program to grab an SSL
+certificate from Let’s Encrypt. Let’s Encrypt is a certificate authority that gives out free SSL
+certificates for web site owners if they can prove that they own a domain. This is done through
+the ACME protocol which Certbot handles for me.</p>
+
+<p>I added Cerbot’s repository,</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>add-apt-repository ppa:certbot/certbot  
+</code></pre>
+</div>
+
+<p>instaled it,</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>sudo apt-get update  
+sudo apt-get install certbot  
+</code></pre>
+</div>
+
+<p>and then ran it.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>certbot certonly --webroot -w /usr/share/nginx/html -d dvn7035.com -d www.dvn7035.com.com  
+</code></pre>
+</div>
+
+<p>The certificates are only valid for like 3 months. After that, they become invalid and your browser
+will probably warn you that this web site is unsecure. I currently rerun this command every so often
+even though I should just have a cron job automate it for me. Oh well, I’ll do it next time when I
+migrate the site again.</p>
+
+<p>All that was left then was to restart Nginx.</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>service nginx restart
+</code></pre>
+</div>
+
+  </div>
+
+  
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">dvn7035</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              <a href="/about">David Nguyen</a>
+            
+            </li>
+            
+            <li><a href="mailto:dvn7035@linux.ucla.edu">dvn7035@linux.ucla.edu</a></li>
+            
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>Yet another technology blog
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

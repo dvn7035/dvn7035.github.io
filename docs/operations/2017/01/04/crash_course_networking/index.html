@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Crash Course Networking</title>
+  <meta name="description" content="So computer networking is pretty simple right? It’s nothing more than bits of 1’s and 0’s moving from one computer to another. Except it’s actually about ele...">
+
+  <link rel="stylesheet" href="/assets/main.css">
+  <link rel="canonical" href="https://www.dvn7035.com/operations/2017/01/04/crash_course_networking/">
+  <link rel="alternate" type="application/rss+xml" title="dvn7035" href="/feed.xml">
+  
+  
+</head>
+
+
+  <body>
+
+    <header class="site-header" role="banner">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">dvn7035</a>
+
+    <nav class="site-nav">
+      <span class="menu-icon">
+        <svg viewBox="0 0 18 15" width="18px" height="15px">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </span>
+      
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Crash Course Networking</h1>
+    <p class="post-meta"><time datetime="2017-01-04T00:00:00-08:00" itemprop="datePublished">Jan 4, 2017</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <p>So computer networking is pretty simple right? It’s nothing more than bits of 1’s and 0’s moving from one computer to another. Except it’s actually about electromagnetic waves propagating from one point to another through some medium. Except electromagnetic waves are made up of photons, so what we really have to talk about is quantum mechanics. And this continues forever if we don’t set up some abstractions. Get used to that word: abstraction. It’s a powerful tool so that we won’t have to know the intricacies of an internal combustion engine in order to learn how to drive a car-metaphorically speaking of course. We’re learning about networking, not cars!</p>
+
+<!--more-->
+
+<p>Thankfully the powers that be at the International Organization for Standardization came up with the Open Systems Interconnection model, or OSI model, to break down networking in different layers. We’re gonna focus on 3 layers: Application, Transport, and Network. Specifically, we’ll look at the interactions between a computer and a web server. I’ll be using a textbook called Computer Networking: A Top Down Approach, 6th edition by Kurose and Ross as reference. I’m not using it because it’s a particularly good book or anything; it just happens to be the only networking book I have because CS 118 at UCLA uses it. Let’s get to it.</p>
+
+<p><img src="/images/OSI-Model.png" alt="OSI-Model" /></p>
+
+<div id="HTTP"></div>
+<h2 id="the-application-layer">The Application Layer</h2>
+
+<p>When people talk about going on the “internet”, what they usually mean is: going on their web browser and using HTTP, that’s hypertext transfer protocol, to look at cute pictures of cats or something. HTTP is an application layer protocol that dictates how a web server and a web browser communicate with one another. Here’s an example of what your browser sends to my web server when you visit my page.</p>
+<blockquote>
+  <p>GET / HTTP/1.1<br />
+Host: www.dvn7035.com<br />
+User-Agent: curl/7.47.0<br />
+Accept: */*</p>
+</blockquote>
+
+<p>The web server will respond with a similar header followed by the actual contents of the page.</p>
+
+<blockquote>
+  <p>HTTP/1.1 200 OK<br />
+Server: nginx/1.10.2<br />
+Date: Wed, 04 Jan 2017 09:05:43 GMT<br />
+Content-Type: text/html<br />
+Content-Length: 7614<br />
+Last-Modified: Wed, 04 Jan 2017 04:10:08 GMT<br />
+Connection: keep-alive<br />
+<em>(continues on with more header information and eventually the text of the actual page)</em></p>
+</blockquote>
+
+<p>But HTTP is just one protocol at this layer. It’s why the web (HTTP) is NOT the internet; it’s just a small part of it. On the internet there’s also DNS so you can get the IP address of a web server, IMAP for email, FTP for file transfer, etc. But we can’t stop here, we gotta go deeper.</p>
+
+<h2 id="the-transport-layer">The Transport Layer</h2>
+
+<p>Let’s go back to our example where your browser requested a page from my web server. How did my web server know that you sent them a request? Where is the web server looking for this request? Where is your web browser looking for these responses?</p>
+
+<p>First of all, I have to talk about TCP. It stands for transmission control protocol and is widely used at the transport layer. When your web browser wants to send that HTTP request from earlier to my web server, your OS crafts a TCP segment and embeds the HTTP request in the segment’s Data field. My web server embeds its response in a TCP segment as well. It’s clear the the HTTP piggybacks off of TCP and it will be a recurring design as we go further.</p>
+
+<p>Here is what a TCP segment looks like.</p>
+
+<p><img src="/images/TCP-Segment.png" alt="TCP-Segment" /></p>
+
+<p>So what are port numbers? Port numbers are unsigned 16 bit numbers that allows your OS to identify which segment is meant for which process in your computer. Suppose you had a web browser open and it was listening in at port 12345 and it was going to send out that TCP enveloped HTTP request. Your OS would set the Source Port as 12345 and Destination Port as 80, the standard port that web server programs listen in on, and send it to my web server. When my web server replies with its TCP enveloped HTTP response, the ports are switched. Its Source port is 80 and its Destination port is 12345. Your OS will know that the segment was meant for your web browser because the segment’s Destination Port is 12345.</p>
+
+<h2 id="the-network-layer">The Network Layer</h2>
+
+<p>Now let’s talk about IP or internet protocol. Wait you might ask: why do we need yet another protocol? Well with that TCP packet and embedded HTTP request to dvn7035.com, we still don’t know where to send it to. We don’t have an address, but thankfully the internet protocol solves this problem.</p>
+
+<p>Every computer and even our home router has an IP address and sends data to each other in the form of IP packets. They look something like this.</p>
+
+<p><img src="/images/IP-Packet.png" alt="IP-Packet" /></p>
+
+<p>Let’s ignore every field except Source Address, Destination Address, and Data. Let’s say our address is 192.168.1.2 and my web server’s address is 162.243.149.160. Your OS again does the heavy lifting and embeds the TCP segment with the HTTP request in the IP packet’s Data field with Source Address 192.168.1.2 and Destination Address 162.243.149.160 and sends it to your router. My web server’s response comes to your computer as a packet with the Source and Destination Address reversed (just like the TCP ports).</p>
+
+<h2 id="in-summary">In Summary</h2>
+
+<p>The interconnected network of networks of computers connected via this TCP/IP suite is called the internet. However, TCP/IP is not how modern applications use the internet. They use higher abstractions at the application layer. Looking at our example of visiting this website, your computer and my web server talk to each other with an HTTP request encapsulated in a TCP segment that is further encapsulated in an IP packet. Here’s another infographic for your benefit.</p>
+
+<p><img src="/images/OSI-Overview.png" alt="OSI-Overview" /></p>
+
+<p>Argh, enough with this theory stuff. Let’s fire up some servers already! I feel ya. Our next topic will be how to set up your first web server.</p>
+
+  </div>
+
+  
+</article>
+
+      </div>
+    </main>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">dvn7035</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>
+            
+              <a href="/about">David Nguyen</a>
+            
+            </li>
+            
+            <li><a href="mailto:dvn7035@linux.ucla.edu">dvn7035@linux.ucla.edu</a></li>
+            
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>Yet another technology blog
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
